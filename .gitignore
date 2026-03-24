@@ -1,1 +1,11 @@
 .vscode/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.db
+*.sqlite3
+*.env
+*.DS_Store 

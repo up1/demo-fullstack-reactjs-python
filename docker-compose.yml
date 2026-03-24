@@ -22,15 +22,31 @@ services:
       timeout: 5s
       retries: 5
 
+  jaeger:
+    image: jaegertracing/jaeger:2.4.0
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:16686/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
     environment:
       DATABASE_URL: postgresql://tracking_user:tracking_pass@db:5432/tracking_db
       REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
 
   frontend:
@@ -47,6 +63,7 @@ services:
     depends_on:
       - backend
       - frontend
+      - jaeger
 
 volumes:
   pgdata:

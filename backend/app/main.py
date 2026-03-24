@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from . import crud, schemas
-from .database import get_db
+from .database import get_db, engine
 from .cache import get_cached, set_cached
+from .tracing import setup_tracing
 
 app = FastAPI(title="Order Tracking API")
+setup_tracing(app, engine)
 
 
 def _serialize(item):
